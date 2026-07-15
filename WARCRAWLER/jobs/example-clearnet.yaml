@@ -1,0 +1,41 @@
+# Standard-web crawl. Run:  ./start.sh run jobs/example-clearnet.yaml
+name: example-clearnet
+seeds:
+  - https://quotes.toscrape.com/
+transport: auto            # auto = onion->Tor, everything else->clearnet
+workers: 16
+
+scope:
+  max_depth: 3
+  max_pages: 300
+  same_domain_only: true
+  # use_sitemaps: true            # also seed from robots Sitemap: + /sitemap.xml
+  # sitemap_max_urls: 5000
+  # deny_domains: ["ads.example.com"]
+  # exclude_patterns: ["/logout", "\\.(zip|exe|dmg)$"]
+
+throttle:
+  profile: normal          # polite | normal | aggressive | stealth | unlimited
+  # Override any single knob after choosing a profile:
+  # respect_robots: false
+  # per_host_delay: 0.0
+  # per_host_concurrency: 8
+
+stealth:
+  rotate_user_agent: true
+  # tls_impersonate: chrome           # requires curl_cffi (requirements-full)
+  # proxies: ["http://user:pass@1.2.3.4:8080"]
+  # proxy_rotation: round_robin       # round_robin | random | sticky_host
+
+extract:
+  extract_content: true               # main-article text (trafilatura)
+  detect_language: true
+  follow_links: true
+  # css_rules:  {price: ".price", headline: "h1"}
+  # xpath_rules: {links: "//a/@href"}
+  # watchlist:  ["(?i)data breach", "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b"]
+
+output:
+  formats: [sqlite, jsonl]            # add 'warc' and/or 'html' to keep raw pages
+  fts: true                           # full-text search index
+  save_raw_html: false

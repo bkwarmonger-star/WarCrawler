@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "warcrawler"
+version = "1.0.0"
+description = "Portable, cross-platform crawler for the standard web and Tor/.onion services"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "httpx[socks]>=0.24",
+    "httpx-socks>=0.8",
+    "lxml>=4.9",
+    "cssselect>=1.2",
+    "aiosqlite>=0.19",
+    "PyYAML>=6.0",
+    "rich>=13.0",
+    "warcio>=1.7",
+    "trafilatura>=1.6",
+    "brotli>=1.1",
+    "zstandard>=0.22",
+]
+
+[project.optional-dependencies]
+full = [
+    "stem>=1.8",
+    "curl_cffi>=0.6",
+    "playwright>=1.40",
+    "selectolax>=0.3",
+    "py3langid>=0.2",
+    "redis>=4.2",
+    "pypdf>=4.0",
+]
+
+[project.scripts]
+warcrawler = "warcrawler.cli:main"
+
+[tool.setuptools]
+packages = ["warcrawler"]

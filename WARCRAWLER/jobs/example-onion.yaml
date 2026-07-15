@@ -1,0 +1,47 @@
+# Tor / .onion crawl. Requires a Tor binary (see tor/README.txt) and the
+# 'full' extras (stem). Run:  ./start.sh run jobs/example-onion.yaml
+#
+# Only crawl services you are authorised to access. This tool is for lawful
+# research, monitoring and archiving.
+name: example-onion
+seeds:
+  # Replace with the onion service(s) you intend to crawl. The Tor Project's
+  # own v3 onion is a safe connectivity test:
+  - https://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion/
+transport: tor
+workers: 6                 # keep modest: onion services are slow and fragile
+
+tor:
+  enabled: true
+  auto_start: true         # launch the bundled Tor from ./tor/<os>/
+  socks_port: 9050
+  control_port: 9051
+  num_circuits: 6          # isolated circuits (one per worker) via SOCKS auth
+  rotate_on_block: true    # NEWNYM when a service starts blocking
+
+scope:
+  max_depth: 4
+  max_pages: 500
+  same_domain_only: true
+
+throttle:
+  profile: stealth         # slow + patient is what survives on Tor
+  respect_robots: false    # most onion services have no robots.txt
+
+stealth:
+  rotate_user_agent: true
+  # Authenticated onion service? Log in via Tor Browser, copy your cookie, and:
+  #   rotate_user_agent: false            # keep the fingerprint stable
+  #   cookies: {session: "PASTE", csrf: "PASTE"}
+  #   headers: {Authorization: "Bearer PASTE"}
+  # (also pin a matching top-level user_agent:)
+
+extract:
+  extract_content: true
+  detect_language: true
+  # watchlist: ["(?i)leak", "(?i)dump", "bitcoin"]
+
+output:
+  formats: [sqlite, jsonl, warc]   # WARC keeps a verifiable raw archive
+  fts: true
+  save_raw_html: true

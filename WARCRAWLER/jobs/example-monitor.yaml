@@ -1,0 +1,33 @@
+# Continuous monitoring: recrawl the same targets on a schedule and flag
+# watchlist matches. Run:  ./start.sh run jobs/example-monitor.yaml
+name: monitor
+seeds:
+  - https://news.ycombinator.com/
+transport: clearnet
+workers: 8
+
+scope:
+  max_depth: 1
+  max_pages: 100
+  same_domain_only: true
+
+throttle:
+  profile: normal
+
+extract:
+  extract_content: true
+  watchlist:
+    - "(?i)\\bacquisition\\b"
+    - "(?i)\\bbreach\\b"
+    - "(?i)\\blayoff"
+
+monitor:
+  enabled: true
+  recrawl_interval: 3600     # seconds between passes (1 hour)
+  max_passes: 0              # 0 = run forever until stopped (Ctrl-C)
+# Conditional GET is on by default, so each pass only re-processes pages that
+# actually changed (unchanged pages return 304 and are skipped).
+
+output:
+  formats: [sqlite, jsonl]
+  fts: true

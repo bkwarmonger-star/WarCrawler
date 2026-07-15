@@ -1,0 +1,10 @@
+# Optional, heavier capabilities. Install with:  pip install -r requirements-full.txt
+-r requirements.txt
+
+stem>=1.8            # Tor control port (circuit rotation / NEWNYM)
+curl_cffi>=0.6       # TLS/JA3 browser impersonation backend
+playwright>=1.40     # JavaScript rendering (run `playwright install chromium` after)
+selectolax>=0.3      # faster HTML parser (optional acceleration)
+py3langid>=0.2       # offline language detection fallback
+redis>=4.2           # Redis frontier backend (multi-machine work-stealing)
+pypdf>=4.0           # extract text from crawled PDFs (searchable + watchlist)

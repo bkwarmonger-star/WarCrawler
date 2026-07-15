@@ -1,0 +1,13 @@
+# Core dependencies — everything needed for clearnet + Tor crawling and the
+# full content pipeline. Cross-platform wheels exist for all of these.
+httpx[socks]>=0.24
+httpx-socks>=0.8
+lxml>=4.9
+cssselect>=1.2
+aiosqlite>=0.19
+PyYAML>=6.0
+rich>=13.0
+warcio>=1.7
+trafilatura>=1.6
+brotli>=1.1
+zstandard>=0.22

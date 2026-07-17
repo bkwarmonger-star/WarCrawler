@@ -1,0 +1,36 @@
+name: suite-ci
+
+on:
+  push:
+    paths: ["common/**", "aegis/**", "bastion/**", "orchestrator/**", "bridge/**", "tests/**", "pyproject.toml"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: install
+        run: pip install -e ".[dev]"
+      - name: pytest (offline)
+        run: pytest -q
+      - name: self-test gate (every registered skill)
+        run: |
+          python - <<'PY'
+          import importlib, pkgutil
+          # import all suite packages so each skill registers its self-test
+          for pkg in ("common", "orchestrator"):
+              importlib.import_module(pkg)
+          from common import selftest
+          passed, total = selftest.run_all()
+          raise SystemExit(0 if passed == total else 1)
+          PY
+
+# Merge gate: nothing merges unless pytest AND every registered --self-test are green.
+# The detection extra (pySigma) + discover extra (playwright) install on the jobs that need them.

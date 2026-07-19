@@ -1,0 +1,24 @@
+{
+  "_comment": "Self-authorization / rules-of-engagement for the active-testing layer. orchestrator.gates.Authorization.from_file() reads this; every active request is gated against `allowlist`. For testing YOUR OWN apps, list your own domains/IPs here. Copy to authorization.json (gitignored) and edit.",
+  "signed": true,
+  "signatory": "you@yourcompany.test",
+  "allowlist": [
+    "app.myapp.test",
+    "*.myapp.test",
+    "127.0.0.1",
+    "10.0.0.0/24"
+  ],
+  "window": {
+    "start": "2026-07-16",
+    "end": "2026-12-31"
+  },
+  "excluded": [
+    "billing.myapp.test"
+  ],
+  "prohibited_techniques": [
+    "denial-of-service",
+    "destructive-payloads",
+    "data-exfiltration-beyond-poc"
+  ],
+  "notes": "Safe-by-default: non-destructive payloads only, rate-limited. Blind SSRF/XXE need an operator-hosted OAST collaborator (see common/oob.py)."
+}

@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegis-bastion-suite"
+version = "0.1.0"
+description = "Authorized purple-team security-testing suite (Aegis offensive + Bastion defensive) built around the WARCRAWLER crawler."
+requires-python = ">=3.10"
+dependencies = []   # cores are stdlib-only
+
+[project.optional-dependencies]
+# bastion/detection needs pySigma + backends
+detection = [
+  "pysigma>=0.11",
+  "pysigma-backend-splunk",
+  "pysigma-backend-elasticsearch",
+  "pysigma-backend-kusto",
+]
+# aegis/discover authenticated JS-rendered crawl
+discover = ["playwright>=1.40"]
+dev = ["pytest>=7"]
+full = ["aegis-bastion-suite[detection,discover,dev]"]
+
+# Auto-discovery: installs whatever suite packages currently exist (common, orchestrator
+# now; aegis.*/bastion.*/bridge get picked up automatically as wave-1..3 agents add them).
+# WARCRAWLER/ (its own project) and tests/ are excluded.
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["common*", "orchestrator*", "armory*", "aegis*", "bastion*", "bridge*"]
+exclude = ["WARCRAWLER*", "tests*", "tor*", "jobs*", "build*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

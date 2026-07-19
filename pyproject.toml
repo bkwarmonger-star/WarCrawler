@@ -27,7 +27,7 @@ full = ["aegis-bastion-suite[detection,discover,dev]"]
 # WARCRAWLER/ (its own project) and tests/ are excluded.
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["common*", "orchestrator*", "aegis*", "bastion*", "bridge*"]
+include = ["common*", "orchestrator*", "armory*", "aegis*", "bastion*", "bridge*"]
 exclude = ["WARCRAWLER*", "tests*", "tor*", "jobs*", "build*"]
 
 [tool.pytest.ini_options]

@@ -14,7 +14,7 @@ Stdlib-only. Deterministic. No secrets in output (see redact).
 # Single source of truth for every canonical schema id -> semver.
 # Defined BEFORE submodule imports because schemas.py reads it at import time.
 SCHEMA_VERSIONS = {
-    "aegis.finding": "1.0",
+    "aegis.finding": "1.1",
     "aegis.enrichment": "1.0",
     "aegis.sbom_finding": "1.0",
     "aegis.engagement": "1.0",

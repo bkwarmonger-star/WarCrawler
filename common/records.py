@@ -64,7 +64,7 @@ class AegisFinding(Record):
     One normalized, de-duplicated finding. `to_dict()` is a superset of the ingest.py /
     report_gen.py findings-table row, plus first-class enrichment + ATT&CK join.
     """
-    SCHEMA: ClassVar[str] = "aegis.finding/1.0"
+    SCHEMA: ClassVar[str] = "aegis.finding/1.1"
 
     finding_id: str
     title: str                                  # "Vulnerability" column
@@ -82,6 +82,18 @@ class AegisFinding(Record):
     remediation: str = ""
     attack_techniques: List[str] = field(default_factory=list)  # <-- purple-team join key
     owasp: Optional[str] = None
+    # --- Armory AWA canonical fields (v1.1): reconciled so awa.py / Findings Parser /
+    #     VIE / Report Generator all speak ONE finding shape. exposure feeds the
+    #     severity×exposure priority matrix; vie = the enrichment score object. ---
+    engagement_id: Optional[str] = None
+    category: Optional[str] = None               # e.g. "web_application"
+    exposure: Optional[str] = None               # internet_facing | internal | isolated
+    owasp_wstg: Optional[str] = None             # e.g. "WSTG-CONF-07"
+    vie: Optional[Dict[str, Any]] = None         # Vulnerability Intelligence Engine score
+    source_tool: Optional[str] = None            # e.g. "awa", "nessus"
+    discovered_at: Optional[str] = None
+    asset_in_scope: Optional[bool] = None
+    retest: Optional[Dict[str, Any]] = None      # {status: pending|fixed|open}
     evidence: str = ""                           # redacted, minimal
     provenance: Dict[str, Any] = field(default_factory=dict)
 

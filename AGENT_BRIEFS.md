@@ -4,9 +4,27 @@ Nine agents, three waves. Each brief below is paste-ready: hand it to one Sonnet
 subagent (ideally in its own git worktree / subdir). Every brief starts from the
 **shared preamble** — prepend it to each.
 
-Source of truth for ported code = the two claude.ai agent JSON exports (Aegis, Bastion);
-the working Python is embedded in each skill's `scripts` field. **Port + adapt + test —
-do not redesign** a skill that already works.
+Source of truth for ported code = the **three** claude.ai agent JSON exports (Aegis,
+Bastion, **Armory**); the working Python is embedded in each skill's `scripts` field.
+**Port + adapt + test — do not redesign** a skill that already works.
+
+> **ARMORY LANDED (wave 0.5, in repo `armory/`).** The toolsmith's two vetted tools are
+> already in-tree, self-tests green — this changes two wave-1.5/3 briefs:
+> - **Agent J (`aegis/active`)** is no longer greenfield. `armory/tools/awa.py` is the DAST
+>   **chassis** (scope-guard + HTTP probe + Nuclei runner + canonical-finding emit). J's job
+>   shrinks to **bolting the deep probes** (SQLi/XSS/SSTI/authz/IDOR/API/SSRF via
+>   `common/payloads.py`) onto AWA's existing guard + emit. Do not re-build the chassis.
+> - **The canonical gate is `armory/tools/engagement.py`** (`authorize_action(target,
+>   technique, at)`), not a hand-rolled one. `orchestrator/gates.py` delegates to it via
+>   `gates.authorize(record, target, technique)`. Every active tool calls it.
+> - **`common/records.AegisFinding` is now v1.1** — reconciled to the real AWA canonical shape
+>   (`engagement_id/category/exposure/owasp_wstg/vie/source_tool/discovered_at/retest/
+>   asset_in_scope`) so awa.py, the Findings Parser, VIE, and the Report Generator speak ONE
+>   finding shape. Emit v1.1.
+> - **`armory/catalog.json`** registers all 17 vetted tools + the `planned` build targets
+>   (coverage-matrix, log-triage, ioc-enrichment, posture-grader, phishing-triage,
+>   remediation-verify, siem-bridge, armory-factory, armory-coverage). Those `planned` rows
+>   are the real greenfield list — everything else is a port.
 
 ---
 

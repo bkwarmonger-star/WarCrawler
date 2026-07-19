@@ -1,0 +1,37 @@
+{
+  "_comment": "The arsenal catalog. Every tool across Aegis/Bastion/Armory, its pipeline stage, methodology anchor, and status. Armory computes coverage/gaps against this. 'vetted' = shipped + self-test green in an agent export; 'planned' = named in an agent's prompt but no script shipped (build target). Keep current as waves land.",
+  "schema": "armory.catalog/1.0",
+  "stages": ["recon", "vuln_analysis", "findings", "remediation", "reporting", "detection", "governance", "monitoring"],
+  "tools": [
+    {"id": "passive-recon", "agent": "aegis", "stage": "recon", "methodology": ["PTES", "OSINT"], "status": "vetted", "source": "aegis-export", "note": "CT logs + DoH subdomain discovery + scope guard"},
+    {"id": "web-posture", "agent": "aegis", "stage": "recon", "methodology": ["OWASP-WSTG-CONF"], "status": "vetted", "source": "aegis-export", "note": "headers/cookies/redirect/security.txt; scope-guarded"},
+    {"id": "scanner-ingest", "agent": "aegis", "stage": "findings", "methodology": ["PTES"], "status": "vetted", "source": "aegis-export", "note": "nmap/nessus/burp/zap/nuclei -> canonical findings (a.k.a. Findings Parser)"},
+    {"id": "nvd-cve-enrichment", "agent": "aegis", "stage": "vuln_analysis", "methodology": ["CVSS", "EPSS", "KEV"], "status": "vetted", "source": "aegis-export", "note": "the VIE (Vulnerability Intelligence Engine): NVD/EPSS/KEV/ExploitDB/Metasploit/GHSA"},
+    {"id": "sbom-scan", "agent": "aegis", "stage": "vuln_analysis", "methodology": ["OSV", "CWE-1104"], "status": "vetted", "source": "aegis-export", "note": "manifests/SBOM -> OSV -> upgrade plan"},
+    {"id": "report-generator", "agent": "aegis", "stage": "reporting", "methodology": ["OWASP", "MITRE-ATTACK"], "status": "vetted", "source": "aegis-export", "note": "findings -> draft client report + findings library"},
+    {"id": "compliance-report", "agent": "aegis", "stage": "reporting", "methodology": ["PCI-DSS", "SOC2", "ISO27001", "ASVS"], "status": "vetted", "source": "aegis-export"},
+    {"id": "attack-path", "agent": "aegis", "stage": "reporting", "methodology": ["MITRE-ATTACK"], "status": "vetted", "source": "aegis-export"},
+    {"id": "retest-delta", "agent": "aegis", "stage": "remediation", "methodology": ["PTES"], "status": "vetted", "source": "aegis-export"},
+    {"id": "engagement-workflow", "agent": "aegis", "stage": "governance", "methodology": ["RoE"], "status": "vetted", "source": "aegis-export", "note": "phase gate + hash-chained audit"},
+    {"id": "exposure-monitor", "agent": "aegis", "stage": "monitoring", "methodology": ["KEV", "EPSS"], "status": "vetted", "source": "aegis-export"},
+
+    {"id": "iac-posture", "agent": "bastion", "stage": "vuln_analysis", "methodology": ["CIS", "D3FEND"], "status": "vetted", "source": "bastion-export", "note": "Terraform/K8s/Dockerfile + secret scan"},
+    {"id": "detection-engine", "agent": "bastion", "stage": "detection", "methodology": ["Sigma", "MITRE-ATTACK"], "status": "vetted", "source": "bastion-export", "note": "Sigma -> Splunk/Elastic/KQL + emulation harness"},
+    {"id": "emulation-planner", "agent": "bastion", "stage": "detection", "methodology": ["MITRE-ATTACK"], "status": "vetted", "source": "bastion-export"},
+    {"id": "skill-factory", "agent": "bastion", "stage": "governance", "methodology": ["self-test-gate"], "status": "vetted", "source": "bastion-export", "note": "scaffold generator; overlaps Armory's builder"},
+
+    {"id": "active-web-assessment", "agent": "armory", "stage": "findings", "methodology": ["OWASP-WSTG", "Nuclei"], "status": "vetted", "source": "armory-export", "path": "armory/tools/awa.py", "note": "scope-guarded HTTP probe + Nuclei runner -> canonical findings. DAST chassis."},
+    {"id": "engagement-scope-manager", "agent": "armory", "stage": "governance", "methodology": ["RoE"], "status": "vetted", "source": "armory-export", "path": "armory/tools/engagement.py", "note": "CANONICAL authorization gate: authorize_action(target, technique, at)"},
+
+    {"id": "coverage-matrix", "agent": "bastion", "stage": "detection", "methodology": ["MITRE-ATTACK", "D3FEND"], "status": "planned", "note": "referenced by emulation-planner; not shipped — build (attacked/detected/mitigated overlay)"},
+    {"id": "log-triage", "agent": "bastion", "stage": "detection", "methodology": ["CEF", "CloudTrail"], "status": "planned"},
+    {"id": "ioc-enrichment", "agent": "bastion", "stage": "detection", "methodology": ["Pyramid-of-Pain"], "status": "planned"},
+    {"id": "posture-grader", "agent": "bastion", "stage": "vuln_analysis", "methodology": ["SPF-DKIM-DMARC", "SSLLabs"], "status": "planned"},
+    {"id": "phishing-triage", "agent": "bastion", "stage": "detection", "methodology": ["DMARC"], "status": "planned"},
+    {"id": "remediation-verify", "agent": "bastion", "stage": "remediation", "methodology": ["closed-loop"], "status": "planned"},
+    {"id": "siem-bridge", "agent": "bastion", "stage": "detection", "methodology": ["backtest"], "status": "planned"},
+    {"id": "active-deep-probes", "agent": "armory", "stage": "findings", "methodology": ["OWASP-WSTG"], "status": "planned", "note": "SQLi/XSS/SSTI/authz/IDOR/API/SSRF probes bolted onto awa.py scope-guard + finding emit (common/payloads.py)"},
+    {"id": "armory-factory", "agent": "armory", "stage": "governance", "methodology": ["self-test-gate"], "status": "planned", "note": "the 'build anything' engine: scaffold + vet + catalog + promotion recommendation"},
+    {"id": "armory-coverage", "agent": "armory", "stage": "governance", "methodology": ["PTES", "OWASP-WSTG", "MITRE-ATTACK"], "status": "planned", "note": "compute where Aegis is blind across stages/methodology"}
+  ]
+}

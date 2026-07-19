@@ -190,6 +190,30 @@ def stage_containment(action: str, target: str, approved: bool = False,
     return staged
 
 
+# ---------------------------------------------------------------- canonical RoE gate (Armory)
+# The CANONICAL authorization decision lives in Armory's Engagement & Scope Manager
+# (armory/tools/engagement.py) — it enforces the four RoE required-elements, test window,
+# scope, and permitted-vs-prohibited techniques against a signed authorization record, and
+# is the same gate Aegis defers to. The Scope/Authorization above are a lightweight
+# transport-layer allowlist for the active probes; for real engagement work, delegate here.
+try:
+    from armory.tools.engagement import Engagement as RoEEngagement
+except Exception:  # armory not importable in isolation
+    RoEEngagement = None
+
+
+def authorize(record: Dict[str, Any], target: str, technique: Optional[str] = None,
+              at=None) -> Dict[str, Any]:
+    """
+    Canonical allow/deny decision via Armory's Engagement gate. `record` = the RoE
+    authorization JSON. Returns {allowed: bool, reasons: [...]}. Prefer this over the
+    lightweight Scope guard whenever an engagement record exists.
+    """
+    if RoEEngagement is None:
+        raise RuntimeError("armory.tools.engagement unavailable — cannot make a canonical RoE decision")
+    return RoEEngagement(record).authorize_action(target, technique, at)
+
+
 # ---------------------------------------------------------------- self-test
 def _self_test() -> int:
     print("=== orchestrator.gates :: SELF-TEST ===")
@@ -224,6 +248,20 @@ def _self_test() -> int:
     except ContainmentNotApproved:
         pass
     print("[PASS] scope allowlist (incl. suffix-spoof block), auth gate, window gate, containment gate")
+    if RoEEngagement is not None:
+        rec = {"engagement_id": "E", "signed": True,
+               "authorized_signatory": {"name": "Owner", "date": "2026-07-01"},
+               "in_scope": {"domains": ["app.myapp.test"], "cidrs": [], "ips": []},
+               "out_of_scope": [], "test_window": {"start": "2026-07-01T00:00:00Z", "end": "2026-12-31T23:59:59Z"},
+               "permitted_techniques": ["web application testing"], "prohibited_techniques": ["denial-of-service"]}
+        import datetime as _dt
+        at = _dt.datetime(2026, 7, 20, tzinfo=_dt.timezone.utc)
+        assert authorize(rec, "app.myapp.test", "web application testing", at)["allowed"]
+        assert not authorize(rec, "evil.example.com", "web application testing", at)["allowed"]
+        assert not authorize(rec, "app.myapp.test", "denial-of-service", at)["allowed"]
+        print("[PASS] canonical RoE delegation to Armory Engagement gate")
+    else:
+        print("[warn] armory.tools.engagement not importable here — canonical delegation skipped")
     print("=== SELF-TEST PASSED ===")
     return 0
 
